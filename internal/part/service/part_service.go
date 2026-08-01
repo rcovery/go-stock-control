@@ -17,15 +17,15 @@ func NewPartService(repo part.Repository) *PartService {
 }
 
 func (s *PartService) Create(ctx context.Context, p part.Part) (part.Part, error) {
+	if err := p.Validate(); err != nil {
+		return part.Part{}, err
+	}
+
 	newID, err := part.NewID()
 	if err != nil {
 		return part.Part{}, err
 	}
 	p.ID = newID
-
-	r := part.CalculateRestock(p)
-	p.ProjectedStock = r.ProjectedStock
-	p.UrgencyScore = r.UrgencyScore
 
 	err = s.repo.Create(ctx, p)
 	if err != nil {
@@ -44,9 +44,9 @@ func (s *PartService) ListByCategory(ctx context.Context, category string) ([]pa
 }
 
 func (s *PartService) Update(ctx context.Context, p part.Part) (part.Part, error) {
-	r := part.CalculateRestock(p)
-	p.ProjectedStock = r.ProjectedStock
-	p.UrgencyScore = r.UrgencyScore
+	if err := p.Validate(); err != nil {
+		return part.Part{}, err
+	}
 
 	err := s.repo.Update(ctx, p)
 	if err != nil {

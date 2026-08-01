@@ -10,8 +10,6 @@ CREATE TABLE parts (
     lead_time_days INTEGER NOT NULL DEFAULT 0,
     unit_cost REAL NOT NULL DEFAULT 0,
     criticality_level INTEGER NOT NULL DEFAULT 1,
-    projected_stock INTEGER NOT NULL DEFAULT 0,
-    urgency_score INTEGER NOT NULL DEFAULT 0,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
     updated_at TEXT DEFAULT CURRENT_TIMESTAMP
 );

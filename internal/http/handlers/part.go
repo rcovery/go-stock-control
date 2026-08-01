@@ -127,6 +127,12 @@ func (h *PartHandler) writeError(w http.ResponseWriter, err error) {
 		return
 	}
 
+	var validationErr errs.ValidationError
+	if errors.As(err, &validationErr) {
+		writeJSONError(w, http.StatusBadRequest, validationErr.Message)
+		return
+	}
+
 	writeJSONError(w, http.StatusInternalServerError, "internal_server_error")
 }
 

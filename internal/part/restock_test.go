@@ -135,11 +135,11 @@ func TestCalculateRestock(t *testing.T) {
 
 func TestSortByRestockPriority(t *testing.T) {
 	parts := []Part{
-		{Name: "Alpha", UrgencyScore: 10, CriticalityLevel: 3, AverageDailySales: 4},
-		{Name: "Beta", UrgencyScore: 10, CriticalityLevel: 5, AverageDailySales: 4},
-		{Name: "Gamma", UrgencyScore: 10, CriticalityLevel: 5, AverageDailySales: 6},
-		{Name: "Delta", UrgencyScore: 20, CriticalityLevel: 1, AverageDailySales: 1},
-		{Name: "Epsilon", UrgencyScore: 10, CriticalityLevel: 5, AverageDailySales: 6},
+		{Name: "Alpha", CurrentStock: 10, MinimumStock: 15, AverageDailySales: 4, CriticalityLevel: 3},
+		{Name: "Beta", CurrentStock: 10, MinimumStock: 13, AverageDailySales: 4, CriticalityLevel: 5},
+		{Name: "Gamma", CurrentStock: 10, MinimumStock: 13, AverageDailySales: 6, CriticalityLevel: 5},
+		{Name: "Delta", CurrentStock: 10, MinimumStock: 30, AverageDailySales: 1, CriticalityLevel: 1},
+		{Name: "Epsilon", CurrentStock: 10, MinimumStock: 13, AverageDailySales: 6, CriticalityLevel: 5},
 	}
 
 	SortByRestockPriority(parts)

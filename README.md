@@ -4,14 +4,14 @@ Criei um módulo "part" (dentro de internal) que serve para representar o que é
 
 A arquitetura do projeto está dividida da seguinte maneira:
 - **Controller**: `internal/http/handlers`
-- **Service** (seria os usecases daquela peça): `internal/part/service/`
-  - `part_service.go`: `PartService`
-  - `restock_service.go`: `RestockService`
-- **Domain** (entidade, regras de negócio) →
+- **Service** (seria os usecases): `internal/part/service/`
+- **Domain** (entidade, regras de negócio):
   `internal/part/part.go`, `restock.go`, `restock_priority.go`
 - **Repository** (interface):
   `internal/part/repository.go`
 - **Implementação do repository**: `internal/part/repository/*`
+
+No início da minha implementação eu cogitei fazer o recurso de cálculo e lista de prioridade de uma maneira mais robusta para ambientes em produção, porém, no final acabei indo por um caminho mais simples para seguir o escopo desse desafio.
 
 ---
 
@@ -52,8 +52,6 @@ curl -vL 'localhost:9000/parts' \
     "criticalityLevel": 3
 }'
 ```
-
-> A urgência de reposição é calculada no momento da inserção/atualização.
 
 ### Listar peças
 
@@ -106,4 +104,4 @@ curl -vX DELETE 'localhost:9000/parts/:id'
 go test -v ./...
 ```
 
-Criei os testes de prioridade e de casos extremos (criticidade alta, tempo de entrega alta, etc...)
+Criei os testes de prioridade e de casos extremos (criticidade alta, tempo de entrega alto, estoque negativo, etc...)

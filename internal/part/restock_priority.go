@@ -10,28 +10,25 @@ type RestockPriority struct {
 }
 
 func BuildRestockPriorities(parts []Part) []RestockPriority {
-	needing := make([]Part, 0, len(parts))
+	needing := make([]restockCandidate, 0, len(parts))
 	for _, p := range parts {
 		r := CalculateRestock(p)
-		p.ProjectedStock = r.ProjectedStock
-		p.UrgencyScore = r.UrgencyScore
-
 		if r.NeedsRestock() {
-			needing = append(needing, p)
+			needing = append(needing, restockCandidate{part: p, restock: r})
 		}
 	}
 
-	SortByRestockPriority(needing)
+	sortRestockCandidates(needing)
 
 	priorities := make([]RestockPriority, 0, len(needing))
-	for _, p := range needing {
+	for _, c := range needing {
 		priorities = append(priorities, RestockPriority{
-			PartID:         p.ID,
-			Name:           p.Name,
-			CurrentStock:   p.CurrentStock,
-			ProjectedStock: p.ProjectedStock,
-			MinimumStock:   p.MinimumStock,
-			UrgencyScore:   p.UrgencyScore,
+			PartID:         c.part.ID,
+			Name:           c.part.Name,
+			CurrentStock:   c.part.CurrentStock,
+			ProjectedStock: c.restock.ProjectedStock,
+			MinimumStock:   c.part.MinimumStock,
+			UrgencyScore:   c.restock.UrgencyScore,
 		})
 	}
 

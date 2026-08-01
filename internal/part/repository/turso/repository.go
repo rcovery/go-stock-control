@@ -21,8 +21,7 @@ func NewRepository(DB *sql.DB) *Repository {
 
 const partColumns = `
 	id, name, category, current_stock, minimum_stock,
-	average_daily_sales, lead_time_days, unit_cost, criticality_level,
-	projected_stock, urgency_score
+	average_daily_sales, lead_time_days, unit_cost, criticality_level
 `
 
 func scanPart(row interface{ Scan(...any) error }) (part.Part, error) {
@@ -38,8 +37,6 @@ func scanPart(row interface{ Scan(...any) error }) (part.Part, error) {
 		&p.LeadTimeDays,
 		&p.UnitCost,
 		&p.CriticalityLevel,
-		&p.ProjectedStock,
-		&p.UrgencyScore,
 	)
 	if err != nil {
 		return p, err
@@ -107,13 +104,11 @@ func (r *Repository) Create(ctx context.Context, p part.Part) error {
 	_, insertionErr := r.DB.ExecContext(ctx, `
 		INSERT INTO parts
 		(id, name, category, current_stock, minimum_stock,
-		 average_daily_sales, lead_time_days, unit_cost, criticality_level,
-		 projected_stock, urgency_score)
+		 average_daily_sales, lead_time_days, unit_cost, criticality_level)
 		VALUES
-		(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+		(?, ?, ?, ?, ?, ?, ?, ?, ?)
 	`, p.ID, p.Name, p.Category, p.CurrentStock, p.MinimumStock,
 		p.AverageDailySales, p.LeadTimeDays, p.UnitCost, p.CriticalityLevel,
-		p.ProjectedStock, p.UrgencyScore,
 	)
 	if insertionErr != nil {
 		return errs.NotCreatedErr.New(insertionErr.Error())
@@ -132,13 +127,11 @@ func (r *Repository) Update(ctx context.Context, p part.Part) error {
 			average_daily_sales = ?,
 			lead_time_days = ?,
 			unit_cost = ?,
-			criticality_level = ?,
-			projected_stock = ?,
-			urgency_score = ?
+			criticality_level = ?
 		WHERE id = ?
 	`, p.Name, p.Category, p.CurrentStock, p.MinimumStock,
 		p.AverageDailySales, p.LeadTimeDays, p.UnitCost, p.CriticalityLevel,
-		p.ProjectedStock, p.UrgencyScore, p.ID,
+		p.ID,
 	)
 	if updateErr != nil {
 		return errs.NotFoundError.New(fmt.Sprintf("Update: %v", updateErr))
