@@ -1,4 +1,16 @@
-# Detalhes da minha submissão
+# Índice
+
+- [Detalhes da minha submissão](#detalhes-da-minha-submissão)
+- [Instruções para rodar localmente](#instruções-para-rodar-localmente)
+- [Exemplos de requisição](#exemplos-de-requisição)
+  - [Criar peça](#criar-peça)
+  - [Listar peças](#listar-peças)
+  - [Listar peças por prioridade de reposição](#listar-peças-por-prioridade-de-reposição)
+  - [Atualizar peça](#atualizar-peça)
+  - [Remover peça](#remover-peça)
+- [Testes automatizados](#testes-automatizados)
+
+## Detalhes da minha submissão
 
 Criei um módulo "part" (dentro de internal) que serve para representar o que é uma "peça" neste projeto, então toda a lógica necessária para gerenciar as peças está isolada de uma maneira simples dentro desse módulo.
 
@@ -72,7 +84,6 @@ curl 'localhost:9000/restock/priorities'
 ```
 
 ### Atualizar peça
-É necessário ter o ID da peça em mãos
 
 ```sh
 curl -vX PUT 'localhost:9000/parts/:id' \
@@ -90,7 +101,6 @@ curl -vX PUT 'localhost:9000/parts/:id' \
 ```
 
 ### Remover peça
-É necessário ter o ID da peça em mãos
 
 ```sh
 curl -vX DELETE 'localhost:9000/parts/:id'
@@ -104,4 +114,14 @@ curl -vX DELETE 'localhost:9000/parts/:id'
 go test -v ./...
 ```
 
-Criei os testes de prioridade e de casos extremos (criticidade alta, tempo de entrega alto, estoque negativo, etc...)
+Criei testes unitários para o cálculo de prioridade e os seguintes edge cases:
+- Não precisa de reposição
+  - Estoque projetado exatamente no mínimo
+  - Vendas diárias zero
+  - Lead time zero
+- Precisa de reposição
+  - Estoque negativo
+  - Lead time alto
+  - Criticidade alta
+
+Também testei casos de desempate na prioridade de acordo com as regras.
