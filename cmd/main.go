@@ -6,18 +6,19 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/rcovery/go-stock-control/internal/config"
 	"github.com/rcovery/go-stock-control/internal/http/handlers"
 	database_turso "github.com/rcovery/go-stock-control/internal/infra/database/turso"
 	"github.com/rcovery/go-stock-control/internal/part"
 	part_repository "github.com/rcovery/go-stock-control/internal/part/repository/turso"
 )
 
-func main() {
-	config.InitConfig()
+const (
+	host = "0.0.0.0"
+	port = "9000"
+)
 
-	connectionString := database_turso.GetConnectionFromEnv()
-	db, databaseErr := database_turso.NewDatabaseConnection(connectionString)
+func main() {
+	db, databaseErr := database_turso.NewDatabaseConnection(database_turso.DatabasePath)
 	if databaseErr != nil {
 		panic(databaseErr)
 	}
@@ -31,9 +32,7 @@ func main() {
 	partHandler := handlers.NewPartHandler(serviceInstance)
 	partHandler.HandlePart()
 
-	host := config.GetString("HOST")
-	port := config.GetString("PORT")
-
-	log.Printf("starting server on %s:%s", host, port)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf("%s:%s", host, port), nil))
+	addr := fmt.Sprintf("%s:%s", host, port)
+	log.Printf("starting server on %s", addr)
+	log.Fatal(http.ListenAndServe(addr, nil))
 }
