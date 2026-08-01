@@ -1,25 +1,29 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
 
-	_ "github.com/lib/pq"
 	"github.com/rcovery/go-stock-control/internal/config"
 	"github.com/rcovery/go-stock-control/internal/http/handlers"
-	"github.com/rcovery/go-stock-control/internal/infra/database/postgres"
+	database_turso "github.com/rcovery/go-stock-control/internal/infra/database/turso"
 	"github.com/rcovery/go-stock-control/internal/part"
-	part_repository "github.com/rcovery/go-stock-control/internal/part/repository/postgres"
+	part_repository "github.com/rcovery/go-stock-control/internal/part/repository/turso"
 )
 
 func main() {
 	config.InitConfig()
 
-	connectionString := postgres.GetConnectionFromEnv()
-	db, databaseErr := postgres.NewDatabaseConnection(connectionString)
+	connectionString := database_turso.GetConnectionFromEnv()
+	db, databaseErr := database_turso.NewDatabaseConnection(connectionString)
 	if databaseErr != nil {
 		panic(databaseErr)
+	}
+
+	if migrateErr := database_turso.Migrate(context.Background(), db); migrateErr != nil {
+		panic(migrateErr)
 	}
 
 	repoInstance := part_repository.NewRepository(db)

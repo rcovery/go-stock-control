@@ -1,4 +1,4 @@
-package postgres
+package turso
 
 import (
 	"context"
@@ -79,7 +79,7 @@ func (r *Repository) ListByCategory(ctx context.Context, category string) ([]par
 	rows, err := r.DB.QueryContext(ctx, `
 		SELECT `+partColumns+`
 		FROM parts
-		WHERE category = $1
+		WHERE category = ?
 		ORDER BY name
 	`, category)
 	if err != nil {
@@ -110,7 +110,7 @@ func (r *Repository) Create(ctx context.Context, p part.Part) error {
 		 average_daily_sales, lead_time_days, unit_cost, criticality_level,
 		 projected_stock, urgency_score)
 		VALUES
-		($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+		(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 	`, p.ID, p.Name, p.Category, p.CurrentStock, p.MinimumStock,
 		p.AverageDailySales, p.LeadTimeDays, p.UnitCost, p.CriticalityLevel,
 		p.ProjectedStock, p.UrgencyScore,
@@ -125,20 +125,20 @@ func (r *Repository) Create(ctx context.Context, p part.Part) error {
 func (r *Repository) Update(ctx context.Context, p part.Part) error {
 	_, updateErr := r.DB.ExecContext(ctx, `
 		UPDATE parts
-		SET name = $2,
-			category = $3,
-			current_stock = $4,
-			minimum_stock = $5,
-			average_daily_sales = $6,
-			lead_time_days = $7,
-			unit_cost = $8,
-			criticality_level = $9,
-			projected_stock = $10,
-			urgency_score = $11
-		WHERE id = $1
-	`, p.ID, p.Name, p.Category, p.CurrentStock, p.MinimumStock,
+		SET name = ?,
+			category = ?,
+			current_stock = ?,
+			minimum_stock = ?,
+			average_daily_sales = ?,
+			lead_time_days = ?,
+			unit_cost = ?,
+			criticality_level = ?,
+			projected_stock = ?,
+			urgency_score = ?
+		WHERE id = ?
+	`, p.Name, p.Category, p.CurrentStock, p.MinimumStock,
 		p.AverageDailySales, p.LeadTimeDays, p.UnitCost, p.CriticalityLevel,
-		p.ProjectedStock, p.UrgencyScore,
+		p.ProjectedStock, p.UrgencyScore, p.ID,
 	)
 	if updateErr != nil {
 		return errs.NotFoundError.New(fmt.Sprintf("Update: %v", updateErr))
@@ -150,7 +150,7 @@ func (r *Repository) Update(ctx context.Context, p part.Part) error {
 func (r *Repository) Delete(ctx context.Context, id part.ID) error {
 	_, deleteErr := r.DB.ExecContext(ctx, `
 		DELETE FROM parts
-		WHERE id = $1
+		WHERE id = ?
 	`, id)
 	if deleteErr != nil {
 		return errs.NotFoundError.New(fmt.Sprintf("Delete: %v", deleteErr))
