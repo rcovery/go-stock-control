@@ -37,13 +37,3 @@ func (p Part) Validate() error {
 
 	return nil
 }
-
-func (p Part) ValidateForCreation() error {
-	if err := p.Validate(); err != nil {
-		return err
-	}
-	if p.CurrentStock < 0 {
-		return errs.NewValidationError("currentStock must not be negative on creation")
-	}
-	return nil
-}

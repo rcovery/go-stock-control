@@ -55,7 +55,7 @@ func TestPartValidateNonNegativeFields(t *testing.T) {
 		{"UnitCost", func(p *Part) { p.UnitCost = -1 }},
 		{"MinimumStock", func(p *Part) { p.MinimumStock = -1 }},
 	}
-	for _, tc := invalidCases {
+	for _, tc := range invalidCases {
 		t.Run(tc.name, func(t *testing.T) {
 			p := valid
 			tc.mutate(&p)
@@ -66,7 +66,7 @@ func TestPartValidateNonNegativeFields(t *testing.T) {
 	}
 }
 
-func TestPartValidateForCreationCurrentStock(t *testing.T) {
+func TestPartValidateNegativeCurrentStock(t *testing.T) {
 	p := Part{
 		Name:              "Filtro",
 		CurrentStock:      -5,
@@ -78,10 +78,6 @@ func TestPartValidateForCreationCurrentStock(t *testing.T) {
 	}
 
 	if err := p.Validate(); err != nil {
-		t.Errorf("Validate() should allow negative CurrentStock, got: %v", err)
-	}
-
-	if err := p.ValidateForCreation(); err == nil {
-		t.Error("ValidateForCreation() should reject negative CurrentStock, got nil")
+		t.Errorf("negative CurrentStock should be valid in any lifecycle stage (backorder), got: %v", err)
 	}
 }

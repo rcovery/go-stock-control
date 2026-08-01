@@ -52,7 +52,7 @@ func (r *Repository) List(ctx context.Context) ([]part.Part, error) {
 		ORDER BY name
 	`)
 	if err != nil {
-		return nil, errs.NotFoundError.New(fmt.Sprintf("List: %v", err))
+		return nil, fmt.Errorf("part list: %w", err)
 	}
 	defer rows.Close()
 
@@ -60,13 +60,13 @@ func (r *Repository) List(ctx context.Context) ([]part.Part, error) {
 	for rows.Next() {
 		p, scanErr := scanPart(rows)
 		if scanErr != nil {
-			return nil, errs.NotFoundError.New(fmt.Sprintf("List: %v", scanErr))
+			return nil, fmt.Errorf("part list: %w", scanErr)
 		}
 		parts = append(parts, p)
 	}
 
 	if err := rows.Err(); err != nil {
-		return nil, errs.NotFoundError.New(fmt.Sprintf("List: %v", err))
+		return nil, fmt.Errorf("part list: %w", err)
 	}
 
 	return parts, nil
@@ -80,7 +80,7 @@ func (r *Repository) ListByCategory(ctx context.Context, category string) ([]par
 		ORDER BY name
 	`, category)
 	if err != nil {
-		return nil, errs.NotFoundError.New(fmt.Sprintf("ListByCategory: %v", err))
+		return nil, fmt.Errorf("part list by category: %w", err)
 	}
 	defer rows.Close()
 
@@ -88,13 +88,13 @@ func (r *Repository) ListByCategory(ctx context.Context, category string) ([]par
 	for rows.Next() {
 		p, scanErr := scanPart(rows)
 		if scanErr != nil {
-			return nil, errs.NotFoundError.New(fmt.Sprintf("ListByCategory: %v", scanErr))
+			return nil, fmt.Errorf("part list by category: %w", scanErr)
 		}
 		parts = append(parts, p)
 	}
 
 	if err := rows.Err(); err != nil {
-		return nil, errs.NotFoundError.New(fmt.Sprintf("ListByCategory: %v", err))
+		return nil, fmt.Errorf("part list by category: %w", err)
 	}
 
 	return parts, nil
@@ -118,7 +118,7 @@ func (r *Repository) Create(ctx context.Context, p part.Part) error {
 }
 
 func (r *Repository) Update(ctx context.Context, p part.Part) error {
-	_, updateErr := r.DB.ExecContext(ctx, `
+	result, execErr := r.DB.ExecContext(ctx, `
 		UPDATE parts
 		SET name = ?,
 			category = ?,
@@ -133,20 +133,36 @@ func (r *Repository) Update(ctx context.Context, p part.Part) error {
 		p.AverageDailySales, p.LeadTimeDays, p.UnitCost, p.CriticalityLevel,
 		p.ID,
 	)
-	if updateErr != nil {
-		return errs.NotFoundError.New(fmt.Sprintf("Update: %v", updateErr))
+	if execErr != nil {
+		return fmt.Errorf("part update: %w", execErr)
+	}
+
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("part update rows affected: %w", err)
+	}
+	if rows == 0 {
+		return errs.NotFoundError.New(fmt.Sprintf("part %q not found", p.ID))
 	}
 
 	return nil
 }
 
 func (r *Repository) Delete(ctx context.Context, id part.ID) error {
-	_, deleteErr := r.DB.ExecContext(ctx, `
+	result, execErr := r.DB.ExecContext(ctx, `
 		DELETE FROM parts
 		WHERE id = ?
 	`, id)
-	if deleteErr != nil {
-		return errs.NotFoundError.New(fmt.Sprintf("Delete: %v", deleteErr))
+	if execErr != nil {
+		return fmt.Errorf("part delete: %w", execErr)
+	}
+
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("part delete rows affected: %w", err)
+	}
+	if rows == 0 {
+		return errs.NotFoundError.New(fmt.Sprintf("part %q not found", id))
 	}
 
 	return nil

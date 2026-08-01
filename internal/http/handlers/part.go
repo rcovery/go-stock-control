@@ -129,7 +129,7 @@ func (h *PartHandler) writeError(w http.ResponseWriter, err error) {
 
 	var validationErr errs.ValidationError
 	if errors.As(err, &validationErr) {
-		writeJSONError(w, http.StatusBadRequest, validationErr.Message)
+		writeJSONErrorDetailed(w, http.StatusBadRequest, "validation_error", validationErr.Message)
 		return
 	}
 
@@ -152,6 +152,19 @@ func writeJSONError(w http.ResponseWriter, status int, code string) {
 
 	encodeErr := json.NewEncoder(w).Encode(map[string]string{
 		"error": code,
+	})
+	if encodeErr != nil {
+		log.Println("failed encoding json error:", encodeErr)
+	}
+}
+
+func writeJSONErrorDetailed(w http.ResponseWriter, status int, code, detail string) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+
+	encodeErr := json.NewEncoder(w).Encode(map[string]string{
+		"error":   code,
+		"message": detail,
 	})
 	if encodeErr != nil {
 		log.Println("failed encoding json error:", encodeErr)
