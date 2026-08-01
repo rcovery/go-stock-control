@@ -17,7 +17,7 @@ func NewPartService(repo part.Repository) *PartService {
 }
 
 func (s *PartService) Create(ctx context.Context, p part.Part) (part.Part, error) {
-	if err := p.Validate(); err != nil {
+	if err := p.ValidateForCreation(); err != nil {
 		return part.Part{}, err
 	}
 

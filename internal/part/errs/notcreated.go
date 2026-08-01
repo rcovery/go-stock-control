@@ -4,11 +4,11 @@ type errNotCreated struct {
 	Message string
 }
 
-func (err *errNotCreated) Error() string {
+func (err errNotCreated) Error() string {
 	return err.Message
 }
 
-func (err *errNotCreated) New(msg string) *errNotCreated {
+func (err errNotCreated) New(msg string) errNotCreated {
 	err.Message = msg
 	return err
 }

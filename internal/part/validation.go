@@ -2,6 +2,7 @@ package part
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/rcovery/go-stock-control/internal/part/errs"
 )
@@ -14,5 +15,35 @@ func (p Part) Validate() error {
 		))
 	}
 
+	if strings.TrimSpace(p.Name) == "" {
+		return errs.NewValidationError("name must not be empty")
+	}
+
+	if p.AverageDailySales < 0 {
+		return errs.NewValidationError("averageDailySales must not be negative")
+	}
+
+	if p.LeadTimeDays < 0 {
+		return errs.NewValidationError("leadTimeDays must not be negative")
+	}
+
+	if p.UnitCost < 0 {
+		return errs.NewValidationError("unitCost must not be negative")
+	}
+
+	if p.MinimumStock < 0 {
+		return errs.NewValidationError("minimumStock must not be negative")
+	}
+
+	return nil
+}
+
+func (p Part) ValidateForCreation() error {
+	if err := p.Validate(); err != nil {
+		return err
+	}
+	if p.CurrentStock < 0 {
+		return errs.NewValidationError("currentStock must not be negative on creation")
+	}
 	return nil
 }
