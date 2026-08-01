@@ -4,14 +4,14 @@ Criei um módulo "part" (dentro de internal) que serve para representar o que é
 
 A arquitetura do projeto está dividida da seguinte maneira:
 - **Controller**: `internal/http/handlers`
-- **Service** (seria os usecases): `internal/part/service/`
+- **Service**: `internal/part/service/`
 - **Domain** (entidade, regras de negócio):
   `internal/part/part.go`, `restock.go`, `restock_priority.go`
 - **Repository** (interface):
   `internal/part/repository.go`
 - **Implementação do repository**: `internal/part/repository/*`
 
-No início da minha implementação eu cogitei fazer o recurso de cálculo e lista de prioridade de uma maneira mais robusta para ambientes em produção, porém, no final acabei indo por um caminho mais simples para seguir o escopo desse desafio.
+No início da minha implementação eu cogitei fazer o recurso de cálculo e lista de prioridade de uma maneira mais robusta para ambientes em produção, porém, no final acabei indo por um caminho mais simples para seguir o escopo do desafio.
 
 ---
 
