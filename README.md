@@ -1,180 +1,101 @@
-# 🚚 Desafio Backend – Motor de Priorização de Reposição de Estoque
+# Detalhes da minha submissão
 
-## 🧩 Contexto
-
-Somos um distribuidor de autopeças. Diariamente precisamos decidir **quais peças devem ser priorizadas para reposição**, considerando:
-
-- Estoque limitado
-- Capital de giro limitado
-- Diferentes níveis de criticidade
-- Padrões de venda distintos
-- Tempo de reposição do fornecedor
-
-O objetivo é construir um microserviço capaz de:
-
-1. Gerenciar peças em estoque
-2. Calcular automaticamente quais peças devem ser priorizadas para reposição
-3. Ordenar as peças por nível de urgência
+Stack:
+- Go 
+- Turso (SQLite)
 
 ---
 
-# 🛠️ Requisitos Funcionais
+## Instruções para rodar localmente
 
-## 1️⃣ CRUD de Peças
+Requisitos: [mise](https://mise.jdx.dev) ou Go 1.26
 
-Criar uma API para:
+```sh
+# Com mise
+mise install
+mise exec go -- go build -o app ./cmd/main.go
+./app
 
-- Criar peça
-- Listar peças
-- Atualizar peça
-- Remover peça
-- Buscar por categoria (opcional)
-
-### 📦 Estrutura da Entidade
-
-```json
-{
-  "id": "uuid",
-  "name": "Filtro de Óleo X",
-  "category": "engine",
-  "currentStock": 15,
-  "minimumStock": 20,
-  "averageDailySales": 4,
-  "leadTimeDays": 5,
-  "unitCost": 18.50,
-  "criticalityLevel": 3
-}
+# Sem mise
+go build -o app ./cmd/main.go
+./app
 ```
 
-## 📝 Descrição dos Campos
-
-| Campo | Descrição |
-|--------|------------|
-| `currentStock` | Estoque atual disponível |
-| `minimumStock` | Estoque mínimo desejado |
-| `averageDailySales` | Média de vendas por dia |
-| `leadTimeDays` | Tempo (em dias) que o fornecedor demora para entregar a peça |
-| `unitCost` | Custo unitário da peça |
-| `criticalityLevel` | Nível de criticidade (1 a 5) |
+O servidor deve subir em `0.0.0.0:9000` e o banco Turso (SQLite) é criado em `app.db` na raiz do projeto.
 
 ---
 
-## 🧠 Endpoint de Priorização
+## Exemplos de requisição
 
-Criar o endpoint:
+### Criar peça
 
-```GET /restock/priorities```
-
-Esse endpoint deve retornar as peças ordenadas por prioridade de reposição.
-
----
-
-## 📐 Regras de Negócio
-
-### 1️⃣ Calcular Consumo Esperado Durante o Lead Time
-
-```expectedConsumption = averageDailySales * leadTimeDays```
-
----
-
-### 2️⃣ Calcular Estoque Projetado
-
-```projectedStock = currentStock - expectedConsumption```
-
----
-
-### 3️⃣ Identificar Necessidade de Reposição
-
-Uma peça precisa de reposição quando:
-```projectedStock < minimumStock```
-
-
----
-
-### 4️⃣ Calcular Score de Prioridade
-
-O score de prioridade deve ser calculado da seguinte forma:
-
-```urgencyScore = (minimumStock - projectedStock) * criticalityLevel```
-
-
-Quanto maior o `urgencyScore`, maior a prioridade de reposição.
-
----
-
-## 🟰 Critérios de Desempate
-
-Em caso de empate no `urgencyScore`, aplicar:
-
-1. Maior `criticalityLevel`
-2. Maior `averageDailySales`
-3. Ordem alfabética pelo nome da peça
-
----
-
-## 📤 Exemplo de Resposta
-
-```json
-{
-  "priorities": [
-    {
-      "partId": "uuid-1",
-      "name": "Filtro de Óleo X",
-      "currentStock": 15,
-      "projectedStock": 5,
-      "minimumStock": 20,
-      "urgencyScore": 45
-    },
-    {
-      "partId": "uuid-2",
-      "name": "Pastilha de Freio Y",
-      "currentStock": 8,
-      "projectedStock": -2,
-      "minimumStock": 10,
-      "urgencyScore": 36
-    }
-  ]
-}
+```sh
+curl -vL 'localhost:9000/parts' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "name": "Filtro de Óleo X",
+    "category": "engine",
+    "currentStock": 15,
+    "minimumStock": 20,
+    "averageDailySales": 4,
+    "leadTimeDays": 5,
+    "unitCost": 18.50,
+    "criticalityLevel": 3
+}'
 ```
 
-### 📌 Regras Gerais
+> A urgência de reposição é calculada no momento da inserção/atualização.
 
-- Não utilizar APIs externas.
-- O sistema deve estar preparado para suportar centenas ou milhares de peças.
-- A solução deve permitir futura troca de banco de dados.
-- O cálculo de prioridade deve estar isolado da camada HTTP.
-- Tratar corretamente casos de estoque negativo.
+### Listar peças
 
-### 🎯 O Que Será Avaliado
-- 🧠 Modelagem de Domínio
-- Clareza das entidades
-- Separação de responsabilidades
-- Organização das regras de negócio
+```sh
+curl 'localhost:9000/parts'
+```
 
-### 🧪 Testes
-- Testes unitários do cálculo de prioridade
-- Testes de cenários extremos (estoque negativo, venda zero, lead time alto)
+Filtrando por categoria:
 
-### 🏗️ Arquitetura
-- Uso adequado de camadas (ex: Controller, Service, Domain, Repository)
-- Código limpo e organizado
-- Facilidade de manutenção
+```sh
+curl 'localhost:9000/parts?category=engine'
+```
 
-### 🧰 Tecnologias
+### Listar peças por prioridade de reposição
 
-Pode ser desenvolvido utilizando:
+```sh
+curl 'localhost:9000/restock/priorities'
+```
 
-- Node.js (com TypeScript)
-- Golang
-- Frameworks e bibliotecas são livres
+### Atualizar peça
+É necessário ter o ID da peça em mãos
 
-### 📄 Entrega
+```sh
+curl -vX PUT 'localhost:9000/parts/:id' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "name": "Filtro de Óleo X",
+    "category": "engine",
+    "currentStock": 30,
+    "minimumStock": 20,
+    "averageDailySales": 4,
+    "leadTimeDays": 5,
+    "unitCost": 18.50,
+    "criticalityLevel": 3
+}'
+```
 
-O projeto deve conter:
+### Remover peça
+É necessário ter o ID da peça em mãos
 
-- Código-fonte organizado
-- README com instruções para rodar localmente
-- Exemplos de requisição
-- Testes automatizados
+```sh
+curl -vX DELETE 'localhost:9000/parts/:id'
+```
 
-Boa implementação 🚀
+---
+
+## Testes automatizados
+
+```sh
+go test -v ./...
+```
+
+Testes criados:
+- Calculo de prioridade
