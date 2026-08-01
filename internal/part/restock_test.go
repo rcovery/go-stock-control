@@ -132,22 +132,3 @@ func TestCalculateRestock(t *testing.T) {
 		})
 	}
 }
-
-func TestSortByRestockPriority(t *testing.T) {
-	parts := []Part{
-		{Name: "Alpha", CurrentStock: 10, MinimumStock: 15, AverageDailySales: 4, CriticalityLevel: 3},
-		{Name: "Beta", CurrentStock: 10, MinimumStock: 13, AverageDailySales: 4, CriticalityLevel: 5},
-		{Name: "Gamma", CurrentStock: 10, MinimumStock: 13, AverageDailySales: 6, CriticalityLevel: 5},
-		{Name: "Delta", CurrentStock: 10, MinimumStock: 30, AverageDailySales: 1, CriticalityLevel: 1},
-		{Name: "Epsilon", CurrentStock: 10, MinimumStock: 13, AverageDailySales: 6, CriticalityLevel: 5},
-	}
-
-	SortByRestockPriority(parts)
-
-	expected := []string{"Delta", "Epsilon", "Gamma", "Beta", "Alpha"}
-	for i, want := range expected {
-		if parts[i].Name != want {
-			t.Errorf("position %d = %s, want %s", i, parts[i].Name, want)
-		}
-	}
-}

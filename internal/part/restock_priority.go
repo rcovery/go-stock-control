@@ -1,5 +1,7 @@
 package part
 
+import "sort"
+
 type RestockPriority struct {
 	PartID         ID     `json:"partId"`
 	Name           string `json:"name"`
@@ -9,19 +11,36 @@ type RestockPriority struct {
 	UrgencyScore   int    `json:"urgencyScore"`
 }
 
+type restockCandidate struct {
+	part    Part
+	restock Restock
+}
+
 func BuildRestockPriorities(parts []Part) []RestockPriority {
-	needing := make([]restockCandidate, 0, len(parts))
+	candidates := make([]restockCandidate, 0, len(parts))
 	for _, p := range parts {
 		r := CalculateRestock(p)
 		if r.NeedsRestock() {
-			needing = append(needing, restockCandidate{part: p, restock: r})
+			candidates = append(candidates, restockCandidate{part: p, restock: r})
 		}
 	}
 
-	sortRestockCandidates(needing)
+	sort.SliceStable(candidates, func(i, j int) bool {
+		a, b := candidates[i], candidates[j]
+		if a.restock.UrgencyScore != b.restock.UrgencyScore {
+			return a.restock.UrgencyScore > b.restock.UrgencyScore
+		}
+		if a.part.CriticalityLevel != b.part.CriticalityLevel {
+			return a.part.CriticalityLevel > b.part.CriticalityLevel
+		}
+		if a.part.AverageDailySales != b.part.AverageDailySales {
+			return a.part.AverageDailySales > b.part.AverageDailySales
+		}
+		return a.part.Name < b.part.Name
+	})
 
-	priorities := make([]RestockPriority, 0, len(needing))
-	for _, c := range needing {
+	priorities := make([]RestockPriority, 0, len(candidates))
+	for _, c := range candidates {
 		priorities = append(priorities, RestockPriority{
 			PartID:         c.part.ID,
 			Name:           c.part.Name,
