@@ -10,6 +10,6 @@ type Part struct {
 	LeadTimeDays      int     `json:"leadTimeDays"`
 	UnitCost          float64 `json:"unitCost"`
 	CriticalityLevel  int     `json:"criticalityLevel"`
-	ProjectedStock    int     `json:"projectedStock"`
-	UrgencyScore      int     `json:"urgencyScore"`
+	ProjectedStock    int     `json:"-"`
+	UrgencyScore      int     `json:"-"`
 }
