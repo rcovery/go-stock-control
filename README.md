@@ -1,8 +1,15 @@
 # Detalhes da minha submissão
 
-Stack:
-- Go 
-- Turso (SQLite)
+Criei um módulo "part" (dentro de internal) que serve para representar o que é uma "peça" neste projeto, então toda a lógica necessária para gerenciar as peças está isolada de uma maneira simples dentro desse módulo.
+
+A arquitetura do projeto está dividida da seguinte maneira:
+- **Controller**: `internal/http/handlers`
+- **Service** (seria os usecases daquela peça) → `internal/part/service.go`
+- **Domain** (entidade, regras de negócio, value objects) →
+  `internal/part/part.go`, `restock.go`
+- **Repository** (interface):
+  `internal/part/repository.go`
+- **Implementação do repository**: `internal/part/repository/*`
 
 ---
 
@@ -13,11 +20,11 @@ Requisitos: [mise](https://mise.jdx.dev) ou Go 1.26
 ```sh
 # Com mise
 mise install
-mise exec go -- go build -o app ./cmd/main.go
+mise exec go -- go build -o app ./cmd/api/main.go
 ./app
 
 # Sem mise
-go build -o app ./cmd/main.go
+go build -o app ./cmd/api/main.go
 ./app
 ```
 

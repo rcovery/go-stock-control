@@ -1,5 +1,7 @@
 package part
 
+// Define o que é uma peça.
+// Seria possível transformar o nome e a categoria em value objects também
 type Part struct {
 	ID                ID      `json:"id"`
 	Name              string  `json:"name"`
