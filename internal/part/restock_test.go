@@ -102,7 +102,7 @@ func TestCalculateRestock(t *testing.T) {
 			needsRestock:  true,
 		},
 		{
-			name: "high lead time amplifies consumption",
+			name: "high lead time",
 			part: Part{
 				CurrentStock:      100,
 				MinimumStock:      20,

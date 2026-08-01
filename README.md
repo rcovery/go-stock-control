@@ -4,9 +4,11 @@ Criei um módulo "part" (dentro de internal) que serve para representar o que é
 
 A arquitetura do projeto está dividida da seguinte maneira:
 - **Controller**: `internal/http/handlers`
-- **Service** (seria os usecases daquela peça) → `internal/part/service.go`
-- **Domain** (entidade, regras de negócio, value objects) →
-  `internal/part/part.go`, `restock.go`
+- **Service** (seria os usecases daquela peça): `internal/part/service/`
+  - `part_service.go`: `PartService`
+  - `restock_service.go`: `RestockService`
+- **Domain** (entidade, regras de negócio) →
+  `internal/part/part.go`, `restock.go`, `restock_priority.go`
 - **Repository** (interface):
   `internal/part/repository.go`
 - **Implementação do repository**: `internal/part/repository/*`
@@ -104,5 +106,4 @@ curl -vX DELETE 'localhost:9000/parts/:id'
 go test -v ./...
 ```
 
-Testes criados:
-- Calculo de prioridade
+Criei os testes de prioridade e de casos extremos (criticidade alta, tempo de entrega alta, etc...)

@@ -8,15 +8,18 @@ import (
 
 	"github.com/rcovery/go-stock-control/internal/part"
 	"github.com/rcovery/go-stock-control/internal/part/errs"
+	part_service "github.com/rcovery/go-stock-control/internal/part/service"
 )
 
 type PartHandler struct {
-	service *part.Service
+	partService    *part_service.PartService
+	restockService *part_service.RestockService
 }
 
-func NewPartHandler(service *part.Service) *PartHandler {
+func NewPartHandler(partService *part_service.PartService, restockService *part_service.RestockService) *PartHandler {
 	return &PartHandler{
-		service: service,
+		partService:    partService,
+		restockService: restockService,
 	}
 }
 
@@ -35,7 +38,7 @@ func (h *PartHandler) createPart(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	created, err := h.service.Create(r.Context(), p)
+	created, err := h.partService.Create(r.Context(), p)
 	if err != nil {
 		h.writeError(w, err)
 		return
@@ -52,9 +55,9 @@ func (h *PartHandler) listParts(w http.ResponseWriter, r *http.Request) {
 		err   error
 	)
 	if category != "" {
-		parts, err = h.service.ListByCategory(r.Context(), category)
+		parts, err = h.partService.ListByCategory(r.Context(), category)
 	} else {
-		parts, err = h.service.List(r.Context())
+		parts, err = h.partService.List(r.Context())
 	}
 	if err != nil {
 		h.writeError(w, err)
@@ -82,7 +85,7 @@ func (h *PartHandler) updatePart(w http.ResponseWriter, r *http.Request) {
 	}
 	p.ID = id
 
-	updated, err := h.service.Update(r.Context(), p)
+	updated, err := h.partService.Update(r.Context(), p)
 	if err != nil {
 		h.writeError(w, err)
 		return
@@ -98,7 +101,7 @@ func (h *PartHandler) deletePart(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.service.Delete(r.Context(), id); err != nil {
+	if err := h.partService.Delete(r.Context(), id); err != nil {
 		h.writeError(w, err)
 		return
 	}
@@ -107,7 +110,7 @@ func (h *PartHandler) deletePart(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *PartHandler) restockPriorities(w http.ResponseWriter, r *http.Request) {
-	priorities, err := h.service.ListRestockPriorities(r.Context())
+	priorities, err := h.restockService.ListPriorities(r.Context())
 	if err != nil {
 		h.writeError(w, err)
 		return
