@@ -19,6 +19,10 @@ func (s *Service) Create(ctx context.Context, p Part) (Part, error) {
 	}
 	p.ID = newID
 
+	r := CalculateRestock(p)
+	p.ProjectedStock = r.ProjectedStock
+	p.UrgencyScore = r.UrgencyScore
+
 	err = s.repo.Create(ctx, p)
 	if err != nil {
 		return Part{}, err
@@ -36,6 +40,10 @@ func (s *Service) ListByCategory(ctx context.Context, category string) ([]Part, 
 }
 
 func (s *Service) Update(ctx context.Context, p Part) error {
+	r := CalculateRestock(p)
+	p.ProjectedStock = r.ProjectedStock
+	p.UrgencyScore = r.UrgencyScore
+
 	return s.repo.Update(ctx, p)
 }
 
