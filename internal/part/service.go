@@ -39,12 +39,26 @@ func (s *Service) ListByCategory(ctx context.Context, category string) ([]Part, 
 	return s.repo.ListByCategory(ctx, category)
 }
 
-func (s *Service) Update(ctx context.Context, p Part) error {
+func (s *Service) ListRestockPriorities(ctx context.Context) ([]RestockPriority, error) {
+	parts, err := s.repo.List(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return BuildRestockPriorities(parts), nil
+}
+
+func (s *Service) Update(ctx context.Context, p Part) (Part, error) {
 	r := CalculateRestock(p)
 	p.ProjectedStock = r.ProjectedStock
 	p.UrgencyScore = r.UrgencyScore
 
-	return s.repo.Update(ctx, p)
+	err := s.repo.Update(ctx, p)
+	if err != nil {
+		return Part{}, err
+	}
+
+	return p, nil
 }
 
 func (s *Service) Delete(ctx context.Context, id ID) error {
