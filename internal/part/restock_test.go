@@ -88,6 +88,32 @@ func TestCalculateRestock(t *testing.T) {
 			expectedScore: 150,
 			needsRestock:  true,
 		},
+		{
+			name: "negative current stock",
+			part: Part{
+				CurrentStock:      -5,
+				MinimumStock:      20,
+				AverageDailySales: 4,
+				LeadTimeDays:      5,
+				CriticalityLevel:  2,
+			},
+			expectedStock: -25,
+			expectedScore: 90,
+			needsRestock:  true,
+		},
+		{
+			name: "high lead time amplifies consumption",
+			part: Part{
+				CurrentStock:      100,
+				MinimumStock:      20,
+				AverageDailySales: 10,
+				LeadTimeDays:      30,
+				CriticalityLevel:  3,
+			},
+			expectedStock: -200,
+			expectedScore: 660,
+			needsRestock:  true,
+		},
 	}
 
 	for _, tt := range tests {
