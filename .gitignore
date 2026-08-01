@@ -1,0 +1,17 @@
+# Environment
+.env
+
+# Turso database files
+*.db
+*.db-wal
+*.db-shm
+
+# Compiled binaries
+/bin/
+*.exe
+*.out
+*.test
+
+# Test coverage
+coverage.out
+coverage.html
