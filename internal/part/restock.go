@@ -2,6 +2,7 @@ package part
 
 type Restock struct {
 	ProjectedStock int
+	MinimumStock   int
 	UrgencyScore   int
 }
 
@@ -16,10 +17,11 @@ func CalculateRestock(p Part) Restock {
 
 	return Restock{
 		ProjectedStock: projectedStock,
+		MinimumStock:   p.MinimumStock,
 		UrgencyScore:   urgencyScore,
 	}
 }
 
 func (r Restock) NeedsRestock() bool {
-	return r.UrgencyScore > 0
+	return r.ProjectedStock < r.MinimumStock
 }
