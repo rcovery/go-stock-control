@@ -1,6 +1,8 @@
 # Índice
 
-- [Detalhes da minha submissão](#detalhes-da-minha-submissão)
+- [Detalhes e decisões da minha submissão](#detalhes-e-decisões-da-minha-submissão)
+  - [Estrutura](#estrutura)
+  - [Cálculo de urgência e prioridade](#cálculo-de-urgência-e-prioridade)
 - [Instruções para rodar localmente](#instruções-para-rodar-localmente)
 - [Exemplos de requisição](#exemplos-de-requisição)
   - [Criar peça](#criar-peça)
@@ -10,11 +12,12 @@
   - [Remover peça](#remover-peça)
 - [Testes automatizados](#testes-automatizados)
 
-## Detalhes da minha submissão
+## Detalhes e decisões da minha submissão
 
-Criei um módulo "part" (dentro de internal) que serve para representar o que é uma "peça" neste projeto, então toda a lógica necessária para gerenciar as peças está isolada de uma maneira simples dentro desse módulo.
+Quando comecei a desenvolver a solução para o desafio, pensei em várias estratégias e  arquiteturas para criar o serviço, optei por jogar fora algumas delas para focar em uma abordagem mais pragmática (explico isso mais pra baixo).
 
-A arquitetura do projeto está dividida da seguinte maneira:
+#### Estrutura
+A estrutura do projeto está dividida da seguinte maneira:
 - **Controller**: `internal/http/handlers`
 - **Service**: `internal/part/service/`
 - **Domain** (entidade, regras de negócio):
@@ -23,7 +26,20 @@ A arquitetura do projeto está dividida da seguinte maneira:
   `internal/part/repository.go`
 - **Implementação do repository**: `internal/part/repository/*`
 
-No início da minha implementação eu cogitei fazer o recurso de cálculo e lista de prioridade de uma maneira mais robusta para ambientes em produção, porém, no final acabei indo por um caminho mais simples para seguir o escopo do desafio.
+Criei um módulo "part" (dentro de internal) de uma maneira idiomática, que representa o que é uma "peça" neste projeto, então toda a lógica necessária para gerenciar as peças está isolada (seguindo a essência de DDD) dentro desse módulo.
+
+Optei por essa estrutura justamente por ser direto ao ponto e por ter somente 1 recurso nesse serviço. Em aplicações maiores, provavelmente eu seguiria uma variação mais escalável disso.
+
+#### Cálculo de urgência e prioridade
+No início da minha implementação eu cogitei fazer o recurso de cálculo e lista de prioridade de uma maneira mais robusta, porém, no final acabei indo por um caminho mais simples para seguir o escopo do desafio.
+
+Para tomar a decisão, eu pensei em coisas como "A aplicação tem um fluxo grande de vendas?", "A lista de reposição será consultada em qual momento?", "Concorrência seria um problema importante?", "Consigo fazer algo robusto do modo mais econômico?", então nas minhas ideias eu considerei coisas como custo (R$) e complexidade.
+
+#### As ideas que eu tive foram:
+- **Calcular e ordenar as peças ao fazer a listagem**: é uma abordagem mais simples (acabei seguindo com essa), mas, em um ambiente de produção com alta demanda não é o ideal por questões de performance e precisão;
+- **Calcular a urgência e necessidade de reposição ao inserir/atualizar as peças**: Essa é uma abordagem bacana, mas dependendo do volume de vendas teria problema com concorrência, aí teríamos que usar locks para garantir que um dado não sobrescreva outro. Eu penso que um microsserviço deste tipo deveria ser rápido, e não travar o processo com locks;
+- **Lançar um job em background para fazer o cálculo de maneira assíncrona**: A ideia é subir um worker leve, algo como um [River](https://riverqueue.com/) para gerenciar a fila. É a ideia que eu quase segui até o final, o problema é que ele dependeria do Postgres para isso, aí quebraria a regra do banco trocável;
+- **RabbitMQ**: Aí já seria um canhão para matar uma formiga, isso depende muito do contexto, se a lista de reposição for consultada via cron às 00h, as ideias acima cairiam por terra;
 
 ---
 
@@ -42,7 +58,7 @@ go build -o app ./cmd/api/main.go
 ./app
 ```
 
-O servidor deve subir em `0.0.0.0:9000` e o banco Turso (SQLite) é criado em `app.db` na raiz do projeto.
+O servidor deve subir em `localhost:9000` e o banco Turso (SQLite) é criado em `app.db` na raiz do projeto.
 
 ---
 
