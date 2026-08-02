@@ -141,3 +141,8 @@ Criei testes unitários para o cálculo de prioridade e os seguintes edge cases:
   - Criticidade alta
 
 Também testei casos de desempate na prioridade de acordo com as regras.
+
+Arquivos dos testes:
+- [Lista de prioridade](internal/part/restock_priority_test.go)
+- [Cálculo de urgência](internal/part/restock_test.go) (Casos extremos incluídos)
+- [Validações da API](internal/part/validation_test.go) (Obs: estoque negativo é permitido)
