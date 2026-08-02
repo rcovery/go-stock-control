@@ -39,7 +39,7 @@ Para tomar a decisão, eu pensei em coisas como "A aplicação tem um fluxo gran
 - **Calcular e ordenar as peças ao fazer a listagem**: é uma abordagem mais simples (acabei seguindo com essa), mas, em um ambiente de produção com alta demanda não é o ideal por questões de performance e precisão;
 - **Calcular a urgência e necessidade de reposição ao inserir/atualizar as peças**: Essa é uma abordagem bacana, mas dependendo do volume de vendas teria problema com concorrência, aí teríamos que usar locks para garantir que um dado não sobrescreva outro. Eu penso que um microsserviço deste tipo deveria ser rápido, e não travar o processo com locks;
 - **Lançar um job em background para fazer o cálculo de maneira assíncrona**: A ideia é subir um worker leve, algo como um [River](https://riverqueue.com/) para gerenciar a fila. É a ideia que eu quase segui até o final, o problema é que ele dependeria do Postgres para isso, aí quebraria a regra do banco trocável;
-- **RabbitMQ**: Aí já seria um canhão para matar uma formiga, isso depende muito do contexto... Se a lista de reposição for consultada via cron às 00h, as ideias acima cairiam por terra;
+- **RabbitMQ**: Aí já seria um canhão para matar uma formiga, isso depende muito do contexto e nesse caso poderia ficar muito mais complexo para dar manutenção;
 
 ---
 
