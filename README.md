@@ -33,7 +33,7 @@ Optei por essa estrutura justamente por ser direto ao ponto e por ter somente 1 
 #### Cálculo de urgência e prioridade
 No início da minha implementação eu cogitei fazer o recurso de cálculo e lista de prioridade de uma maneira mais robusta, porém, no final acabei indo por um caminho mais simples para seguir o escopo do desafio.
 
-Para tomar a decisão, eu pensei em coisas como "A aplicação tem um fluxo grande de vendas?", "A lista de reposição será consultada em qual momento?", "Concorrência seria um problema importante?", "Consigo fazer algo robusto do modo mais econômico?", então nas minhas ideias eu considerei coisas como custo (R$) e complexidade.
+Para tomar a decisão, eu pensei em coisas como "A aplicação tem um fluxo grande de vendas?", "A lista de reposição será consultada em qual momento?", "Concorrência seria um problema importante?", "Consigo fazer algo robusto do modo mais econômico?", "O cálculo pode mudar?", então nas minhas ideias eu considerei coisas como custo (R$) e complexidade.
 
 #### As ideas que eu tive foram:
 - **Calcular e ordenar as peças ao fazer a listagem**: é uma abordagem mais simples (acabei seguindo com essa), mas, em um ambiente de produção com alta demanda não é o ideal por questões de performance e precisão;
