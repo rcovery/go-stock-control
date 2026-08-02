@@ -1,0 +1,13 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ryan-go-stock-control
+    ports:
+      - "9000:9000"
+    volumes:
+      - stock-control-data:/app
+
+volumes:
+  stock-control-data:

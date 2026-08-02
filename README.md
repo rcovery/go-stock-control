@@ -45,7 +45,7 @@ Para tomar a decisão, eu pensei em coisas como "A aplicação tem um fluxo gran
 
 ## Instruções para rodar localmente
 
-Requisitos: [mise](https://mise.jdx.dev) ou Go 1.26
+Requisitos: [mise](https://mise.jdx.dev), Go 1.26 ou Docker.
 
 ```sh
 # Com mise
@@ -56,9 +56,12 @@ mise exec go -- go build -o app ./cmd/api/main.go
 # Sem mise
 go build -o app ./cmd/api/main.go
 ./app
+
+# Com Docker Compose
+docker compose up --build
 ```
 
-O servidor deve subir em `localhost:9000` e o banco Turso (SQLite) é criado em `app.db` na raiz do projeto.
+O servidor deve subir em `localhost:9000` e o banco Turso (SQLite) é criado em `app.db` na raiz do projeto. Com Docker, o `app.db` é persistido no volume `stock-control-data`.
 
 ---
 
